@@ -1,3 +1,9 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+
 class Room {
     private int roomNumber;
     private String roomType;
@@ -29,10 +35,21 @@ class Room {
         this.pricePerNight = pricePerNight;
     }
 
-    public void displayRoomInfo() {
-        System.out.println("Room Number: " + roomNumber);
-        System.out.println("Room Type: " + roomType);
-        System.out.println("Price per Night: " + pricePerNight + " KZT");
+    public String toString() {
+        return "Room Number: " + roomNumber +
+                ", Room Type: " + roomType +
+                ", Price per Night: " + pricePerNight + " KZT";
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Room room = (Room) o;
+        return roomNumber == room.roomNumber;
+    }
+
+    public int hashCode() {
+        return Objects.hash(roomNumber);
     }
 }
 
@@ -49,21 +66,23 @@ class Guest {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public int getAge() {
         return age;
     }
 
-    public void setAge(int age) {
-        this.age = age;
+    public String toString() {
+        return "Guest Name: " + name + ", Age: " + age;
     }
 
-    public void displayGuestInfo() {
-        System.out.println("Guest Name: " + name);
-        System.out.println("Age: " + age);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Guest guest = (Guest) o;
+        return Objects.equals(name, guest.name);
+    }
+
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }
 
@@ -84,59 +103,57 @@ class Booking {
         return guest;
     }
 
-    public void setGuest(Guest guest) {
-        this.guest = guest;
-    }
-
     public Room getRoom() {
         return room;
     }
 
-    public void setRoom(Room room) {
-        this.room = room;
-    }
-
-    public String getCheckInDate() {
-        return checkInDate;
-    }
-
-    public void setCheckInDate(String checkInDate) {
-        this.checkInDate = checkInDate;
-    }
-
-    public String getCheckOutDate() {
-        return checkOutDate;
-    }
-
-    public void setCheckOutDate(String checkOutDate) {
-        this.checkOutDate = checkOutDate;
-    }
-
-    public void displayBookingInfo() {
-        System.out.println("Guest Name: " + guest.getName());
-        System.out.println("Age: " + guest.getAge());
-        System.out.println("Room Number: " + room.getRoomNumber());
-        System.out.println("Room Type: " + room.getRoomType());
-        System.out.println("Price per Night: " + room.getPricePerNight() + " KZT");
-        System.out.println("Check-in Date: " + checkInDate);
-        System.out.println("Check-out Date: " + checkOutDate);
+    public String toString() {
+        return "Booking Details:\n" +
+                "  " + guest + "\n" +
+                "  " + room + "\n" +
+                "  Check-in Date: " + checkInDate + "\n" +
+                "  Check-out Date: " + checkOutDate;
     }
 }
 
 public class Main {
     public static void main(String[] args) {
-        Room room1 = new Room(101, "Single", 50000.0);
-        Room room2 = new Room(102, "Double", 80000.0);
 
-        Guest guest1 = new Guest("Alina", 30);
-        Guest guest2 = new Guest("Dauren", 25);
+        List<Room> rooms = new ArrayList<>();
+        rooms.add(new Room(101, "Single", 50000.0));
+        rooms.add(new Room(102, "Double", 80000.0));
+        rooms.add(new Room(103, "Suite", 120000.0));
 
-        Booking booking1 = new Booking(guest1, room1, "2024-12-16", "2024-12-18");
-        Booking booking2 = new Booking(guest2, room2, "2024-12-17", "2024-12-20");
+        List<Guest> guests = new ArrayList<>();
+        guests.add(new Guest("Alina", 30));
+        guests.add(new Guest("Dauren", 25));
+        guests.add(new Guest("Marat", 28));
 
-        System.out.println("Booking 1:");
-        booking1.displayBookingInfo();
-        System.out.println("\nBooking 2:");
-        booking2.displayBookingInfo();
+        List<Booking> bookings = new ArrayList<>();
+        bookings.add(new Booking(guests.get(0), rooms.get(0), "2024-12-16", "2024-12-18"));
+        bookings.add(new Booking(guests.get(1), rooms.get(1), "2024-12-17", "2024-12-20"));
+
+        System.out.println("Поиск бронирования по имени 'Alina':");
+        for (Booking booking : bookings) {
+            if (booking.getGuest().getName().equals("Alina")) {
+                System.out.println(booking);
+            }
+        }
+
+        System.out.println("\nСортировка комнат по цене:");
+        Collections.sort(rooms, Comparator.comparingDouble(Room::getPricePerNight));
+        for (Room room : rooms) {
+            System.out.println(room);
+        }
+
+        System.out.println("\nПоиск комнаты с номером 102:");
+        Room foundRoom = null;
+        for (Room room : rooms) {
+            if (room.getRoomNumber() == 102) {
+                foundRoom = room;
+                break;
+            }
+        }
+        System.out.println(foundRoom);
     }
 }
